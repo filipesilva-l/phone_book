@@ -34,13 +34,37 @@ fn get_index_to_add(list: &Vec<Record>, name: &String) -> usize {
         return 0;
     }
 
-    let a: Vec<bool> = list.iter().map(|r| &r.name < name).collect();
-    println!("{:?}", a);
+    let mut low_index = 0;
+    let mut high_index = list.len() - 1;
 
-    return match list.iter().position(|r| (&r.name < name) == false) {
-        None => list.len(),
-        Some(i) => i,
-    };
+    while low_index <= high_index {
+        let mid_index = (((high_index - low_index) / 2) + low_index) as usize;
+        let mid_value = &list[mid_index];
+        let mid_name = &mid_value.name;
+
+        if mid_name > name {
+            if mid_index > 0 {
+                high_index = mid_index - 1;
+                continue;
+            } else {
+                return 0;
+            }
+        }
+
+        let next_value = list.get(mid_index + 1);
+        let next_value_is_bigger = match next_value {
+            None => true,
+            Some(next_value) => &next_value.name > name,
+        };
+
+        if next_value_is_bigger {
+            return mid_index + 1;
+        }
+
+        low_index = mid_index + 1;
+    }
+
+    0
 }
 
 fn get_phones() -> Result<Vec<Record>, Box<dyn Error>> {
